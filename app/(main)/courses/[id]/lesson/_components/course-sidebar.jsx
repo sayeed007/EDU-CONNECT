@@ -32,7 +32,6 @@ export const CourseSidebar = async ({ courseId }) => {
       const lessonId = lesson._id.toString();
       const watch = await Watch.findOne({ lesson: lessonId, module: moduleId, user: loggedinUser.id }).lean();
       if (watch?.state === 'completed') {
-        // console.log(`This lesson ${lesson.title} has completed`);
         lesson.state = 'completed';
       }
       return lesson;

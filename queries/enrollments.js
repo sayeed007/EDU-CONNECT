@@ -2,7 +2,7 @@ import { Enrollment } from "@/model/enrollment-model";
 import { Course } from "@/model/course-model";
 import { replaceMongoIdInArray } from "@/lib/convertData";
 
-
+// GET ENROLLMENT BY COURSE ID
 export async function getEnrollmentsForCourse(courseId) {
   const enrollments = await Enrollment.find({ course: courseId }).lean();
   return replaceMongoIdInArray(enrollments);

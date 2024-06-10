@@ -3,8 +3,10 @@ import { cn } from "@/lib/utils";
 
 import { getLesson } from "@/queries/lessons";
 
-const CourseLessonList = async ({lessonId}) => {
+const CourseLessonList = async ({ lessonId }) => {
     const lesson = await getLesson(lessonId);
+
+
     return (
         <button
             type="button"

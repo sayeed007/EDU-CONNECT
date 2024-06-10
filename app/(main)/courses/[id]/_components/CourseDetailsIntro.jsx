@@ -1,15 +1,14 @@
-import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 
 import { EnrollCourse } from "@/components/enroll-course";
 
+import { auth } from "@/auth";
 import { hasEnrollmentForCourse } from "@/queries/enrollments";
 import { getUserByEmail } from "@/queries/users";
-import { auth } from "@/auth";
 
-import { redirect } from "next/navigation";
 
 const CourseDetailsIntro = async ({ course }) => {
   const session = await auth();
@@ -20,30 +19,50 @@ const CourseDetailsIntro = async ({ course }) => {
 
   return (
     <div className="overflow-x-hidden  grainy">
-      <section className="pt-12  sm:pt-16">
+      <section className="pt-12 sm:pt-16">
         <div className="container">
+
+          {/* COURSE TITLE & ENROLLMENT */}
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
+
+              {/* COURSE SUB-TITLE */}
               <h1 className="px-6 text-lg text-gray-600 font-inter">
                 {course?.subtitle}
               </h1>
+
+              {/* COURSE TITLE */}
               <p className="mt-5 text-4xl font-bold leading-tight text-gray-900 sm:leading-tight sm:text-5xl lg:text-6xl lg:leading-tight font-pj">
                 <span className="relative inline-flex sm:inline">
                   <span className="bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] blur-lg filter opacity-30 w-full h-full absolute inset-0"></span>
-                  <span className="relative">{course?.title}</span>
+                  <span className="relative">
+                    {course?.title}
+                  </span>
                 </span>
               </p>
 
+              {/* ENROLLMENT & INTRO*/}
               <div className="mt-6 flex items-center justify-center flex-wrap gap-3">
+
+                {/* ENROLLMENT */}
                 {
-                  hasEnrollment ? (
-                    <Link href={`/courses/${course?.id}/lesson`} className={cn(buttonVariants({ size: "lg" }))}>
-                      Access Course
-                    </Link>
-                  ) : (
-                    <EnrollCourse courseId={course?.id} />
-                  )
+                  hasEnrollment ?
+                    (
+                      <Link
+                        href={`/courses/${course?.id}/lesson`}
+                        className={cn(buttonVariants({ size: "lg" }))}>
+                        Access Course
+                      </Link>
+                    )
+                    :
+                    (
+                      <EnrollCourse
+                        courseId={course?.id}
+                      />
+                    )
                 }
+
+                {/*   */}
                 <Link
                   href=""
                   className={cn(
@@ -53,9 +72,11 @@ const CourseDetailsIntro = async ({ course }) => {
                   See Intro
                 </Link>
               </div>
+
             </div>
           </div>
 
+          {/* COURSE MAIN IMAGE */}
           <div className="pb-12  mt-6">
             <div className="relative">
               <div className="absolute inset-0 h-2/3"></div>
@@ -66,12 +87,14 @@ const CourseDetailsIntro = async ({ course }) => {
                     width={768}
                     height={463}
                     src={`/assets/images/courses/${course?.thumbnail}`}
-                    alt=""
+                    alt={course?.title}
                   />
                 </div>
               </div>
             </div>
           </div>
+
+
         </div>
       </section>
     </div>

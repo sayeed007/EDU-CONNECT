@@ -1,10 +1,15 @@
 import { Lesson } from "@/model/lesson.model";
 import { replaceMongoIdInObject } from "@/lib/convertData";
 
+
+// GET SPECIFIC LESSON BY LESSON ID
 export async function getLesson(lessonId) {
-    const lesson = await Lesson.findById(lessonId).lean();
+    const lesson = await Lesson
+        .findById(lessonId)
+        .lean();
+
     return replaceMongoIdInObject(lesson);
-}
+};
 
 export async function create(lessonData) {
     try {
@@ -13,7 +18,7 @@ export async function create(lessonData) {
     } catch (error) {
         throw new Error(error);
     }
-}
+};
 
 export async function getLessonBySlug(slug) {
     try {
@@ -22,4 +27,4 @@ export async function getLessonBySlug(slug) {
     } catch (error) {
         throw new Error(error);
     }
-}
+};

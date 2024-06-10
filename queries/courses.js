@@ -12,10 +12,26 @@ import { replaceMongoIdInArray, replaceMongoIdInObject } from "@/lib/convertData
 import { getEnrollmentsForCourse } from "./enrollments";
 import { getTestimonialsForCourse } from "./testimonials";
 
+
+// Custom groupBy function
+function groupBy(array, keyFn) {
+    return array.reduce((result, item) => {
+        const key = keyFn(item);
+        if (!result[key]) {
+            result[key] = [];
+        }
+        result[key].push(item);
+        return result;
+    }, {});
+};
+
+
 // GET ALL ACTIVE COURSE LIST WITH LINKED(CATEGORY, INSTRUCTOR, TESTIMONIAL, MODULES) DATA
 export async function getCourseList() {
     const courses = await Course
         .find({ active: true })
+        .sort({ modifiedOn: -1 }) // Sort by modifiedOn field in descending order
+        .limit(10) // Limit the results to the latest 10 courses
         .select(["title", "subtitle", "thumbnail", "modules", "price", "category", "instructor"])
         .populate({
             path: "category",
@@ -38,6 +54,8 @@ export async function getCourseList() {
     return replaceMongoIdInArray(courses);
 };
 
+
+// GET SPECIFIC COURSE DETAILS BY ID
 export async function getCourseDetails(id) {
     const course = await Course
         .findById(id)
@@ -76,13 +94,18 @@ export async function getCourseDetails(id) {
         .lean();
 
     return replaceMongoIdInObject(course)
-}
+};
 
+
+// GET COURSE DETAILS BY INSTRUCTOR ID
 export async function getCourseDetailsByInstructor(instructorId, expand) {
+
+    // Step 1: Fetch Published Courses
     const publishedCourses = await Course
         .find({ instructor: instructorId, active: true })
         .lean();
 
+    // Step 2: Fetch Enrollments - By Published Courses
     const enrollments = await Promise.all(
         publishedCourses.map(async (course) => {
             const enrollment = await getEnrollmentsForCourse(course._id.toString());
@@ -90,17 +113,21 @@ export async function getCourseDetailsByInstructor(instructorId, expand) {
         })
     );
 
-    const groupedByCourses = Object.groupBy(enrollments.flat(), ({ course }) => course);
+    // Step 3: Group Enrollments by Course
+    const groupedByCourses = groupBy(enrollments?.flat(), ({ course }) => course);
 
+    // Step 4: Calculate Total Revenue
     const totalRevenue = publishedCourses.reduce((acc, course) => {
         const quantity = groupedByCourses[course._id] ? groupedByCourses[course._id].length : 0;
         return (acc + quantity * course.price)
     }, 0);
 
+    // Step 5: Calculate Total Enrollments
     const totalEnrollments = enrollments.reduce(function (acc, obj) {
         return acc + obj.length;
     }, 0)
 
+    // Step 6: Fetch Testimonials
     const testimonials = await Promise.all(
         publishedCourses.map(async (course) => {
             const testimonial = await getTestimonialsForCourse(course._id.toString());
@@ -108,11 +135,14 @@ export async function getCourseDetailsByInstructor(instructorId, expand) {
         })
     );
 
+    // Step 7: Calculate Average Rating
     const totalTestimonials = testimonials.flat();
     const avgRating = (totalTestimonials.reduce(function (acc, obj) {
         return acc + obj.rating;
     }, 0)) / totalTestimonials.length;
 
+
+    // Step 8: Return Results
     if (expand) {
         const allCourses = await Course.find({ instructor: instructorId }).lean();
         return {
@@ -120,14 +150,15 @@ export async function getCourseDetailsByInstructor(instructorId, expand) {
             "enrollments": enrollments?.flat(),
             "reviews": totalTestimonials,
         }
-    }
+    };
+
     return {
         "courses": publishedCourses.length,
         "enrollments": totalEnrollments,
         "reviews": totalTestimonials.length,
         "ratings": avgRating.toPrecision(2),
         "revenue": totalRevenue
-    }
+    };
 }
 
 export async function create(courseData) {
@@ -137,4 +168,4 @@ export async function create(courseData) {
     } catch (error) {
         throw new Error(error);
     }
-}
+};
