@@ -15,7 +15,7 @@ import { ModuleActions } from "./_components/module-action";
 import { getModule } from "@/queries/modules";
 import { replaceMongoIdInArray } from "@/lib/convertData";
 
-const moduleData = async ({ params: { courseId, moduleId } }) => {
+const ModulePage = async ({ params: { courseId, moduleId } }) => {
   const moduleData = await getModule(moduleId);
 
   const lessons = replaceMongoIdInArray(moduleData.lessonIds).sort((a, b) => a.order - b.order);
@@ -77,4 +77,4 @@ const moduleData = async ({ params: { courseId, moduleId } }) => {
   );
 };
 
-export default Module;
+export default ModulePage;

@@ -118,5 +118,3 @@ export const {
         },
     },
 });
-
-console.log("Auth.js configuration secret:", process.env.NEXT_AUTH_SECRET);

@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/formatPrice";
 import {
   ArrowRight,
-  ArrowRightIcon,
   BookOpen,
   MessageSquare,
   Presentation,
   Star,
-  UsersRound,
+  UsersRound
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+
 const courses = [
   {
     id: 1,
@@ -31,6 +31,7 @@ const courses = [
     thumbnail: "/assets/images/categories/marketing.jpg",
   },
 ];
+
 const InstructorProfile = () => {
   return (
     <section id="categories" className="space-y-6  py-6  lg:py-12">
@@ -40,7 +41,7 @@ const InstructorProfile = () => {
           <div className="bg-white rounded-2xl p-6 shadow">
             <div className="mb-6">
               <div className="w-36 h-36 rounded-full  mb-5 mx-auto overflow-hidden">
-                <img
+                <Image
                   src="https://avatars.githubusercontent.com/u/3633137?v=4"
                   alt=""
                   className="w-full h-full object-cover rounded"
